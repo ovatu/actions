@@ -78,7 +78,6 @@ jobs:
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
         input-directory: ${{ inputs.helm-chart }}
         output-directory: charts/${{ inputs.gitops-name }}/release
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, release: ${{ steps.variables.outputs.release }}"
@@ -92,3 +91,52 @@ jobs:
           echo "BEGIN inputs.gitops-script"
           ${{ inputs.gitops-script }}
           echo "BEGIN inputs.gitops-script"
+
+    - name: Send Slack webhook
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ github.event.head_commit.message }}"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*App:* ${{ inputs.gitops-name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Version:* ${{ steps.variables.outputs.tag }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:* ${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Tag:* ${{ github.ref_name }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

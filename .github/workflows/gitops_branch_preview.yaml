@@ -83,7 +83,6 @@ jobs:
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
         input-directory: ${{ inputs.helm-chart }}
         output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
@@ -130,15 +129,19 @@ jobs:
                   },
                   {
                     "type": "mrkdwn",
-                    "text": "*Repo:* ${{ github.ref_name }}"
+                    "text": "*Version:* ${{ steps.variables.outputs.tag }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:* ${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:* ${{ steps.variables.outputs.branch }}"
                   },
                   {
                     "type": "mrkdwn",
                     "text": "*Commit:* ${{ steps.variables.outputs.ref }}"
-                  },
-                  {
-                    "type": "mrkdwn",
-                    "text": "*Version:* ${{ steps.variables.outputs.tag }}"
                   }
                 ]
               }
