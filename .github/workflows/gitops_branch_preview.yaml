@@ -3,6 +3,10 @@ name: Docker Build -> Docker Hub + AWS ECR -> Gitops (branch preview)
 on:
   workflow_call:
     inputs:
+      name:
+        description: Friendly name of the app
+        type: string
+        required: true
       docker-name:
         description: Name of the docker image
         type: string
@@ -93,3 +97,52 @@ jobs:
           echo "BEGIN inputs.gitops-script"
           ${{ inputs.gitops-script }}
           echo "BEGIN inputs.gitops-script"
+
+    - name: Send Slack webhook
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ github.event.head_commit.message }}"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "plain_text",
+                    "text": "*App:* ${{ inputs.gitops-name }}"
+                  },
+                  {
+                    "type": "plain_text",
+                    "text": "*Repo:* ${{ github.ref_name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit:* ${{ steps.variables.outputs.ref }}"
+                  }
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Version:* ${{ steps.variables.outputs.tag }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
