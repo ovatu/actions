@@ -91,7 +91,6 @@ jobs:
           yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml
           yq -i '.image.repository = "${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}"' values.yaml
           yq -i '.image.tag = "${{ steps.variables.outputs.tag }}"' values.yaml
-          yq -i '.service.deploy.version = "${{ steps.variables.outputs.tag }}"' values.yaml
           echo "DONE writing values"
 
           echo "BEGIN inputs.gitops-script"
