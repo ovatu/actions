@@ -3,6 +3,10 @@ name: Docker Build -> Docker Hub + AWS ECR -> Gitops (release)
 on:
   workflow_call:
     inputs:
+      name:
+        description: Friendly name of the app
+        type: string
+        required: true
       docker-name:
         description: Name of the docker image
         type: string
