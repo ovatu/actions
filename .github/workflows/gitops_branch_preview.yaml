@@ -73,7 +73,9 @@ jobs:
       with:
         file: deploy/kubernetes/docker/Dockerfile
         push: true
-        tags: ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}, ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.image }}:${{ steps.variables.outputs.tag }}
+        tags: |
+          ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
+          ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
 
     - name: Gitops
       uses: ovatu/action-gitops-release@main
