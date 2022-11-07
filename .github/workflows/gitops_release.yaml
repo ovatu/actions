@@ -1,4 +1,4 @@
-name: Docker Build -> Docker Hub + AWS ECR -> Gitops (branch preview)
+name: Docker Build -> Docker Hub + AWS ECR -> Gitops (release)
 
 on:
   workflow_call:
@@ -54,8 +54,7 @@ jobs:
       run: |
         echo "repo=${{ inputs.docker-name }}" >> $GITHUB_OUTPUT
         echo "tag=${{ github.ref_name }}-$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
-        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-        echo "ref=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+        echo "release=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
     - name: Login to Docker
       id: docker-login
@@ -81,8 +80,8 @@ jobs:
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
         input-directory: ${{ inputs.helm-chart }}
-        output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
-        message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
+        output-directory: charts/${{ inputs.gitops-name }}/release
+        message: "[Actions][Build] repo:${{ inputs.gitops-name }}, release: ${{ steps.variables.outputs.release }}"
         script: |
           echo "BEGIN writing values"
           yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml

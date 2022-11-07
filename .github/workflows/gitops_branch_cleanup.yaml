@@ -1,0 +1,42 @@
+name: Docker Build -> Docker Hub + AWS ECR -> Gitops
+
+on:
+  workflow_call:
+    inputs:
+      gitops-repo:
+        description: Repo for gitops
+        type: string
+        required: true
+      gitops-name:
+        description: Name of the gitops app
+        type: string
+        required: true
+    secrets:
+      GITOPS_REPO_PRIVATE_KEY:
+        required: true
+      SLACK_WEBHOOK_URL:
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set variables
+      id: variables
+      run: |
+        echo "branch=${{ github.event.ref }}" >> $GITHUB_OUTPUT
+
+    - name: Gitops cleanup
+      uses: ovatu/action-gitops-cleanup@main
+      with:
+        repository: ${{ inputs.gitops-repo }}
+        repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
+        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
+        message: "[Actions][Cleanup] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}"
