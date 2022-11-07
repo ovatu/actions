@@ -35,8 +35,6 @@ on:
         required: true
       SLACK_WEBHOOK_URL_DEVOPS:
         required: true
-      SLACK_WEBHOOK_URL_UPDATES:
-        required: true
 
 permissions:
   contents: read
