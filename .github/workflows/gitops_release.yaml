@@ -102,14 +102,14 @@ jobs:
                 "type": "header",
                 "text": {
                   "type": "plain_text",
-                  "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+                  "text": "Released: ${{ inputs.name }}, v: ${{ steps.variables.outputs.release }}"
                 }
               },
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "${{ github.event.head_commit.message }}"
+                  "text": "${{ github.event.release.body }}"
                 }
               },
               {
