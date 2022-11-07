@@ -125,17 +125,17 @@ jobs:
                 "type": "context",
                 "elements": [
                   {
-                    "type": "plain_text",
+                    "type": "mrkdwn",
                     "text": "*App:* ${{ inputs.gitops-name }}"
                   },
                   {
-                    "type": "plain_text",
+                    "type": "mrkdwn",
                     "text": "*Repo:* ${{ github.ref_name }}"
                   },
                   {
                     "type": "mrkdwn",
                     "text": "*Commit:* ${{ steps.variables.outputs.ref }}"
-                  }
+                  },
                   {
                     "type": "mrkdwn",
                     "text": "*Version:* ${{ steps.variables.outputs.tag }}"
