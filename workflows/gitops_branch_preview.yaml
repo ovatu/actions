@@ -1,0 +1,95 @@
+name: Docker Build -> Docker Hub + AWS ECR -> Gitops
+
+on:
+  workflow_call:
+    inputs:
+      docker-name:
+        description: Name of the docker image
+        type: string
+        required: true
+      docker-file:
+        description: Location of Dockerfile
+        type: string
+      helm-chart:
+        description: Location of helm charts
+        type: string
+      gitops-repo:
+        description: Repo for gitops
+        type: string
+        required: true
+      gitops-name:
+        description: Name of the gitops app
+        type: string
+        required: true
+      gitops-script:
+        description: Script to run during gitops (update values.yaml)
+        type: string
+    secrets:
+      AWS_ASSUME_ROLE:
+        required: true
+      DOCKER_HUB_USERNAME:
+        required: true
+      DOCKER_HUB_PASSWORD:
+        required: true
+      GITOPS_REPO_PRIVATE_KEY:
+        required: true
+      SLACK_WEBHOOK_URL_DEVOPS:
+        required: true
+      SLACK_WEBHOOK_URL_UPDATES:
+        required: true
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  AWS_ECR_REPO: ${{ inputs.repo }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set variables
+      id: variables
+      run: |
+        echo "repo=${{ inputs.docker-name }}" >> $GITHUB_OUTPUT
+        echo "tag=${{ github.ref_name }}-$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "ref=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+
+    - name: Login to Docker
+      id: docker-login
+      uses: ovatu/action-docker-login@main
+      with:
+        docker-hub-username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+        aws-assume-role: ${{ secrets.AWS_ASSUME_ROLE }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v3
+      with:
+        file: deploy/kubernetes/docker/Dockerfile
+        push: true
+        tags: ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}, ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.image }}:${{ steps.variables.outputs.tag }}
+
+    - name: Gitops
+      uses: ovatu/action-gitops-release@main
+      with:
+        repository: ${{ inputs.gitops-repo }}
+        repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
+        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL_DEVOPS }}
+        input-directory: ${{ inputs.helm-chart }}
+        output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
+        message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
+        script: |
+          echo "BEGIN writing values file"
+          yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml
+          yq -i '.image.repository = "${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}"' values.yaml
+          yq -i '.image.tag = "${{ steps.variables.outputs.tag }}"' values.yaml
+          yq -i '.service.deploy.version = "${{ steps.variables.outputs.tag }}"' values.yaml
+          echo "DONE writing values file"
