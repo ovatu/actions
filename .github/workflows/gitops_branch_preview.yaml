@@ -102,7 +102,7 @@ jobs:
       with:
         payload: |
           {
-            "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}\n\n${{ toJson(github.event.head_commit.message) }}",
+            "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}: ${{ steps.variables.outputs.ref }} }}",
             "blocks": [
               {
                 "type": "header",
