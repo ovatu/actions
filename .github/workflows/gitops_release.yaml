@@ -110,7 +110,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": ${{ toJson(github.event.release.body) }}
+                  "text": ${{ toJson(github.event.release.body) || 'No release notes' }}
                 }
               },
               {

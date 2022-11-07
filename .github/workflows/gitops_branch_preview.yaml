@@ -115,7 +115,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "${{ toJson(github.event.head_commit.message) }}"
+                  "text": "${{ toJson(github.event.head_commit.message) || 'No message' }}"
                 }
               },
               {
