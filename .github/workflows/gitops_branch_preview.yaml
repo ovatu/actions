@@ -102,7 +102,7 @@ jobs:
       with:
         payload: |
           {
-            "text": ${{ toJson("Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}\n\n${{ github.event.head_commit.message }}") }},
+            "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}\n\n${{ toJson(github.event.head_commit.message) }}",
             "blocks": [
               {
                 "type": "header",
@@ -115,7 +115,7 @@ jobs:
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": ${{ toJson("${{ github.event.head_commit.message }}") }}
+                  "text": "${{ toJson(github.event.head_commit.message) }}"
                 }
               },
               {
