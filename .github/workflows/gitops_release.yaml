@@ -97,6 +97,7 @@ jobs:
       with:
         payload: |
           {
+            "text": "Released: ${{ inputs.name }}, v: ${{ steps.variables.outputs.release }}\n\n${{ github.event.release.body }}",
             "blocks": [
               {
                 "type": "header",

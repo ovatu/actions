@@ -3,6 +3,10 @@ name: Docker Build -> Docker Hub + AWS ECR -> Gitops
 on:
   workflow_call:
     inputs:
+      name:
+        description: Repo for gitops
+        type: string
+        required: true
       gitops-repo:
         description: Repo for gitops
         type: string
@@ -37,6 +41,44 @@ jobs:
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
         directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
         message: "[Actions][Cleanup] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}"
+
+    - name: Send Slack webhook
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "text": "Preview deleted: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Preview deleted: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*App:* ${{ inputs.gitops-name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:* ${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:* ${{ steps.variables.outputs.branch }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
