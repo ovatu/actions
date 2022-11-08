@@ -60,6 +60,7 @@ jobs:
         echo "tag=${{ github.ref_name }}-$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
         echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
         echo "ref=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+        echo "slug=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)"
 
     - name: Login to Docker
       id: docker-login
@@ -84,7 +85,7 @@ jobs:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}
-        output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
+        output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
         script: |
           echo "BEGIN writing values"
