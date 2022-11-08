@@ -52,7 +52,7 @@ jobs:
       with:
         payload: |
           {
-            "text": "Preview deleted: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+            "text": "Preview deleted: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}",
             "blocks": [
               {
                 "type": "header",
