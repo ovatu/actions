@@ -34,14 +34,17 @@ jobs:
     - name: Set variables
       id: variables
       run: |
+        SLUG=$(echo "${{ github.event.ref }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+
         echo "branch=${{ github.event.ref }}" >> $GITHUB_OUTPUT
+        echo "slug=$SLUG" >> $GITHUB_OUTPUT
 
     - name: Gitops cleanup
       uses: ovatu/action-gitops-cleanup@main
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.branch }}
+        directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
         message: "[Actions][Cleanup] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}"
 
     - name: Send Slack webhook

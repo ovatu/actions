@@ -63,7 +63,7 @@ jobs:
         echo "tag=$SLUG-$REF" >> $GITHUB_OUTPUT
         echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
         echo "ref=$REF" >> $GITHUB_OUTPUT
-        echo "slug=$SLUG"
+        echo "slug=$SLUG" >> $GITHUB_OUTPUT
 
     - name: Login to Docker
       id: docker-login
