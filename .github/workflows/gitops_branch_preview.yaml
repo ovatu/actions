@@ -25,8 +25,15 @@ on:
         description: Name of the gitops app
         type: string
         required: true
-      gitops-script:
+      gitops-values-script:
         description: Script to run during gitops (update values.yaml)
+        type: string
+      gitops-preview-values:
+        description: Values to create values.yaml
+        type: string
+        default: false
+      gitops-preview-values-script:
+        description: Script to run during gitops (update values.preview.yaml)
         type: string
     secrets:
       AWS_ASSUME_ROLE:
@@ -67,7 +74,7 @@ jobs:
 
     - name: Login to Docker
       id: docker-login
-      uses: ovatu/action-docker-login@main
+      uses: .github/actions/docker_login.yaml
       with:
         docker-hub-username: ${{ secrets.DOCKER_HUB_USERNAME }}
         docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -83,23 +90,23 @@ jobs:
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
 
     - name: Gitops
-      uses: ovatu/action-gitops-release@main
+      uses: .github/actions/gitops.yaml
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}
         output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
-        script: |
+        values-script: |
           echo "BEGIN writing values"
           yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml
           yq -i '.image.repository = "${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}"' values.yaml
           yq -i '.image.tag = "${{ steps.variables.outputs.tag }}"' values.yaml
           echo "DONE writing values"
 
-          echo "BEGIN inputs.gitops-script"
-          ${{ inputs.gitops-script }}
-          echo "BEGIN inputs.gitops-script"
+          ${{ inputs.gitops-values-script }}
+        preview-values: ${{ inputs.gitops-preview-values }}
+        preview-values-script: ${{ inputs.gitops-preview-values-script }}
 
     - name: Send Slack webhook
       uses: slackapi/slack-github-action@v1.23.0
