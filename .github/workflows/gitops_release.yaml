@@ -62,7 +62,7 @@ jobs:
 
     - name: Login to Docker
       id: docker-login
-      uses: .github/actions/docker_login.yaml
+      uses: ./.github/actions/docker_login.yaml
       with:
         docker-hub-username: ${{ secrets.DOCKER_HUB_USERNAME }}
         docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -78,7 +78,7 @@ jobs:
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
 
     - name: Gitops
-      uses: .github/actions/gitops.yaml
+      uses: ./.github/actions/gitops.yaml
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
