@@ -85,7 +85,7 @@ jobs:
         input-directory: ${{ inputs.helm-chart }}
         output-directory: charts/${{ inputs.gitops-name }}/release
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, release: ${{ steps.variables.outputs.release }}"
-        script: |
+        values-script: |
           echo "BEGIN writing values"
           yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml
           yq -i '.image.repository = "${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}"' values.yaml
