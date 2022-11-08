@@ -56,11 +56,14 @@ jobs:
     - name: Set variables
       id: variables
       run: |
+        SLUG=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+        REF=$(git rev-parse --short "$GITHUB_SHA")
+
         echo "repo=${{ inputs.docker-name }}" >> $GITHUB_OUTPUT
-        echo "tag=${{ github.ref_name }}-$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
+        echo "tag=$SLUG-$REF" >> $GITHUB_OUTPUT
         echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-        echo "ref=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_OUTPUT
-        echo "slug=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)"
+        echo "ref=$REF" >> $GITHUB_OUTPUT
+        echo "slug=$SLUG"
 
     - name: Login to Docker
       id: docker-login
