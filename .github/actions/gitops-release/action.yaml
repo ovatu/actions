@@ -37,6 +37,11 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: "Sync input directory to output directory"
+      shell: bash
+      run: |
+        echo "inputs.preview: ${{ inputs.preview }}"
+
     - name: Checkout GitOps repo
       uses: actions/checkout@v3
       with: 

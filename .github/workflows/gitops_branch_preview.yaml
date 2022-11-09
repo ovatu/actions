@@ -7,6 +7,10 @@ on:
         description: Friendly name of the app
         type: string
         required: true
+      docker:
+        description: Should run docker build
+        type: boolean
+        required: true
       docker-name:
         description: Name of the docker image
         type: string
@@ -80,6 +84,7 @@ jobs:
         echo "OVATU_TEST=pass" >> $GITHUB_ENV
 
     - name: Login to Docker
+      if: inputs.docker
       id: docker-login
       uses: ovatu/actions/.github/actions/docker-login@main
       with:
@@ -88,6 +93,7 @@ jobs:
         aws-assume-role: ${{ secrets.AWS_ASSUME_ROLE }}
 
     - name: Build and push
+      if: inputs.docker
       uses: docker/build-push-action@v3
       with:
         file: deploy/kubernetes/docker/Dockerfile
