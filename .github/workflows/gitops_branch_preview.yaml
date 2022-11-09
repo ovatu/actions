@@ -76,6 +76,7 @@ jobs:
         echo "ref=$REF" >> $GITHUB_OUTPUT
         echo "slug=$SLUG" >> $GITHUB_OUTPUT
         echo "test=pass" >> $GITHUB_STATE
+        echo "OVATU_TEST=pass" >> $GITHUB_ENV
 
     - name: Login to Docker
       id: docker-login
