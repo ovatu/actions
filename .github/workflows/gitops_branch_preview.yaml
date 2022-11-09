@@ -10,7 +10,7 @@ on:
       docker:
         description: Should run docker build
         type: boolean
-        required: true
+        default: true
       docker-name:
         description: Name of the docker image
         type: string
