@@ -94,7 +94,7 @@ jobs:
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
 
     - name: Gitops
-      uses: ovatu/action-gitops-release@main
+      uses: ovatu/actions/.github/actions/gitops.yaml@main
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
