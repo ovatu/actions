@@ -62,7 +62,7 @@ runs:
       run:  ${{ inputs.values-script }}
 
     - name: Touch preview file
-      if: inputs.preview
+      if: inputs.preview == true
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
       run: |
