@@ -1,87 +1,34 @@
-name: "GitOps"
-description: "Run GitOps"
+name: "Login to Docker"
+description: "Login to Docker, both Docker Hub and AWS ECR"
 inputs:
-  values-script:
-    description: "Script to run to update values.yaml file"
-  preview:
-    description: "Should create values.preview.yaml"
-    type: boolean
-    default: false
-  preview-values:
-    description: "values to create values.preview.yaml file"
-  preview-values-script:
-    description: "Script to run to update values.preview.yaml file"
-  repository:
-    required: true
-    description: "Repo to use for GitOps"
-  repository-ssh-key:
-    required: true
-    description: "SSH Key to use to authenticate GitOps repo"
-  input-directory:
-    required: true
-    description: "Input directory, usually containing a helm chart to sync over to GitOps repo"
-  output-directory:
-    required: true
-    description: "Output directory, in the GitOps repo to place the output, usually a helm chart"
-  message:
-    required: true
-    description: "Message to use as part of the GitOps commit"
-  user-name:
-    required: true
-    default: O2V2
-    description: "Message to use as part of the GitOps commit"
-  user-email:
-    required: true
-    default: ci@ovatu.com
-    description: "Message to use as part of the GitOps commit"
+   docker-hub-username:
+     description: "docker-hub-username"
+   docker-hub-password:
+     description: "docker-hub-password"
+   aws-assume-role:
+     description: "Role for to assume for AWS"
+outputs:
+  ecr-registry:
+    description: "ecr-registry"
+    value: ${{ steps.login-ecr.outputs.registry }}
 runs:
   using: "composite"
   steps:
-    - name: Checkout GitOps repo
-      uses: actions/checkout@v3
-      with: 
-        repository: ${{ inputs.repository }}
-        ssh-key: ${{ inputs.repository-ssh-key }}
-        path: ./gitops
+  - name: Login to Docker Hub
+    if: inputs.docker-hub-username && inputs.docker-hub-password
+    uses: docker/login-action@v2
+    with:
+      username: ${{ inputs.docker-hub-username }}
+      password: ${{ inputs.docker-hub-password }}
 
-    - name: "Sync input directory to output directory"
-      shell: bash
-      run: rsync -vr --delete $GITHUB_WORKSPACE/${{ inputs.input-directory }} $GITHUB_WORKSPACE/gitops/${{ inputs.output-directory }}
+  - name: Configure AWS credentials
+    if: inputs.aws-assume-role
+    uses: aws-actions/configure-aws-credentials@v1
+    with:
+      role-to-assume:  ${{ inputs.aws-assume-role }}
+      aws-region: us-east-1
 
-    - name: Run values script
-      if: inputs.values-script
-      shell: bash
-      working-directory: gitops/${{ inputs.output-directory }}
-      run:  ${{ inputs.values-script }}
+  - name: Login to Amazon ECR
+    id: login-ecr
+    uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Touch preview file
-      if: inputs.preview
-      shell: bash
-      working-directory: gitops/${{ inputs.output-directory }}
-      run: touch values.preview.yaml
-
-    - name: Create preview values
-      if: inputs.preview && inputs.preview-values
-      shell: bash
-      working-directory: gitops/${{ inputs.output-directory }}
-      run: echo "${{ inputs.preview-values }}" >> values.preview.yaml
-
-    - name: Run preview-values script
-      if: inputs.preview && inputs.preview-values-script
-      shell: bash
-      working-directory: gitops/${{ inputs.output-directory }}
-      run: ${{ inputs.values-script }}
-
-    - name: "Commit changes to GitOps repo"
-      shell: bash
-      working-directory: gitops/${{ inputs.output-directory }}
-      run: |
-        git config user.name ${{ inputs.user-name }}
-        git config user.email ${{ inputs.user-email }}
-
-        git add .
-
-        if [ -n "$(git status --porcelain)" ]; then
-          git commit -am "${{ inputs.message }}"
-          git push
-        fi
