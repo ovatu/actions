@@ -75,6 +75,7 @@ jobs:
         echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
         echo "ref=$REF" >> $GITHUB_OUTPUT
         echo "slug=$SLUG" >> $GITHUB_OUTPUT
+        echo "test=pass" >> $GITHUB_STATE
 
     - name: Login to Docker
       id: docker-login
