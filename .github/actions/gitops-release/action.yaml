@@ -61,13 +61,13 @@ runs:
       run: touch values.preview.yaml
 
     - name: Create preview values
-      if: ${{ inputs.preview && inputs.preview-values }}
+      if: inputs.preview && inputs.preview-values
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
       run: echo "${{ inputs.preview-values }}" >> values.preview.yaml
 
     - name: Run preview-values script
-      if: ${{ inputs.preview && inputs.preview-values-script }}
+      if: inputs.preview && inputs.preview-values-script
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
       run: ${{ inputs.preview-values-script }}

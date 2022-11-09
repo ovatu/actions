@@ -35,7 +35,6 @@ on:
       gitops-preview-values:
         description: Values to create values.yaml
         type: string
-        default: false
       gitops-preview-values-script:
         description: Script to run during gitops (update values.preview.yaml)
         type: string
