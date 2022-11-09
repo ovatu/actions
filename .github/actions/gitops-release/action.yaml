@@ -47,7 +47,8 @@ runs:
     - name: "Sync input directory to output directory"
       shell: bash
       run: |
-        rsync -vr --mkpath --delete $GITHUB_WORKSPACE/${{ inputs.input-directory }} $GITHUB_WORKSPACE/gitops/${{ inputs.output-directory }}/chart
+        mkdir -p gitops/${{ inputs.output-directory }}/chart
+        rsync -vr --delete $GITHUB_WORKSPACE/${{ inputs.input-directory }} $GITHUB_WORKSPACE/gitops/${{ inputs.output-directory }}/chart
 
     - name: Run values script
       if: inputs.values-script
