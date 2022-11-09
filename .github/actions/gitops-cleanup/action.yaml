@@ -1,0 +1,50 @@
+name: "GitOps"
+description: "Run GitOps"
+inputs:
+  repository:
+    required: true
+    description: "Repo to use for GitOps"
+  repository-ssh-key:
+    required: true
+    description: "SSH Key to use to authenticate GitOps repo"
+  directory:
+    required: true
+    description: "Output directory, in the GitOps repo to place the output, usually a helm chart"
+  message:
+    required: true
+    description: "Message to use as part of the GitOps commit"
+  user-name:
+    required: true
+    default: O2V2
+    description: "Message to use as part of the GitOps commit"
+  user-email:
+    required: true
+    default: ci@ovatu.com
+    description: "Message to use as part of the GitOps commit"
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout GitOps repo
+      uses: actions/checkout@v3
+      with: 
+        repository: ${{ inputs.repository }}
+        ssh-key: ${{ inputs.repository-ssh-key }}
+        path: ./gitops
+
+    - name: "Deleting directory"
+      shell: bash
+      run: rm -r $GITHUB_WORKSPACE/gitops/${{ inputs.directory }}
+
+    - name: "Commit changes to GitOps repo"
+      shell: bash
+      working-directory: gitops
+      run: |
+        git config user.name ${{ inputs.user-name }}
+        git config user.email ${{ inputs.user-email }}
+
+        git add .
+
+        if [ -n "$(git status --porcelain)" ]; then
+          git commit -am "${{ inputs.message }}"
+          git push
+        fi
