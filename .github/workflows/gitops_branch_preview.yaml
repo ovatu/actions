@@ -66,6 +66,8 @@ jobs:
     - name: Set variables
       id: variables
       run: |
+        echo "input.preview: ${{ inputs.preview }}"
+
         SLUG=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
         REF=$(git rev-parse --short "$GITHUB_SHA")
 
