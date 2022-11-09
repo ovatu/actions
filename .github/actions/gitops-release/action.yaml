@@ -80,7 +80,7 @@ runs:
       if: inputs.preview != 'true'
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
-      run: rm -r preview
+      run: rm -rf preview
 
     - name: "Commit changes to GitOps repo"
       shell: bash
