@@ -40,7 +40,7 @@ jobs:
         echo "slug=$SLUG" >> $GITHUB_OUTPUT
 
     - name: Gitops cleanup
-      uses: ovatu/actions/.github/actions/gitops_cleanup.yaml
+      uses: ovatu/action-gitops-cleanup.yaml
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
