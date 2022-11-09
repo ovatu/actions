@@ -64,7 +64,7 @@ runs:
       if: inputs.preview && inputs.preview-values
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
-      run: echo "${{ inputs.preview-values' }}" >> values.preview.yaml
+      run: echo "${{ inputs.preview-values }}" >> values.preview.yaml
 
     - name: Run preview-values script
       if: inputs.preview && inputs.preview-values-script
