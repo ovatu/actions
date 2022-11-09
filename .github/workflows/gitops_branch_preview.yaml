@@ -78,7 +78,7 @@ jobs:
 
     - name: Login to Docker
       id: docker-login
-      uses: ovatu/action-docker-login.yaml
+      uses: ovatu/action-docker-login@main
       with:
         docker-hub-username: ${{ secrets.DOCKER_HUB_USERNAME }}
         docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -94,7 +94,7 @@ jobs:
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
 
     - name: Gitops
-      uses: ovatu/action-gitops-release.yaml
+      uses: ovatu/action-gitops-release@main
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
