@@ -83,7 +83,7 @@ jobs:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}
-        output-directory: charts/${{ inputs.gitops-name }}/release
+        output-directory: apps/${{ inputs.gitops-name }}/release
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, release: ${{ steps.variables.outputs.release }}"
         values-script: |
           echo "BEGIN writing values"

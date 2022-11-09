@@ -44,7 +44,7 @@ jobs:
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
+        directory: apps/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
         message: "[Actions][Cleanup] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}"
 
     - name: Send Slack webhook

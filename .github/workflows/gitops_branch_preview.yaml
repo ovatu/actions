@@ -100,7 +100,7 @@ jobs:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}
-        output-directory: charts/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
+        output-directory: apps/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}, commit:${{ steps.variables.outputs.ref }}"
         values-script: |
           echo "BEGIN writing values"
