@@ -66,6 +66,7 @@ runs:
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
       run: |
+        echo "inputs.preview: ${{ inputs.preview }}"
         mkdir -p preview
         touch preview/values.yaml
 
