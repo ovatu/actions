@@ -71,16 +71,22 @@ runs:
         touch preview/values.yaml
 
     - name: Create preview values
-      if: inputs.preview && inputs.preview-values
+      if: inputs.preview == 'true' && inputs.preview-values
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}/preview
       run: echo "${{ inputs.preview-values }}" >> values.yaml
 
     - name: Run preview-values script
-      if: inputs.preview && inputs.preview-values-script
+      if: inputs.preview == 'true' && inputs.preview-values-script
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}/preview
       run: ${{ inputs.preview-values-script }}
+
+    - name: remove preview if empty
+      if: inputs.preview != 'true'
+      shell: bash
+      working-directory: gitops/${{ inputs.output-directory }}
+      run: rm -r preview
 
     - name: "Commit changes to GitOps repo"
       shell: bash
