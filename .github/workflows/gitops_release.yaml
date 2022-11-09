@@ -25,7 +25,7 @@ on:
         description: Name of the gitops app
         type: string
         required: true
-      gitops-script:
+      gitops-values-script:
         description: Script to run during gitops (update values.yaml)
         type: string
     secrets:
@@ -92,9 +92,9 @@ jobs:
           yq -i '.image.tag = "${{ steps.variables.outputs.tag }}"' values.yaml
           echo "DONE writing values"
 
-          echo "BEGIN inputs.gitops-script"
-          ${{ inputs.gitops-script }}
-          echo "BEGIN inputs.gitops-script"
+          echo "BEGIN inputs.gitops-values-script"
+          ${{ inputs.gitops-values-script }}
+          echo "BEGIN inputs.gitops-values-script"
 
     - name: Send Slack webhook
       uses: slackapi/slack-github-action@v1.23.0
