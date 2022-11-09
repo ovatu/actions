@@ -118,7 +118,7 @@ jobs:
           echo "DONE writing values"
 
           ${{ inputs.gitops-values-script }}
-        preview: ${{ inputs.gitops-preview == 'true' }}
+        preview: ${{ inputs.gitops-preview == true }}
         preview-values: ${{ inputs.gitops-preview-values }}
         preview-values-script: ${{ inputs.gitops-preview-values-script }}
 
