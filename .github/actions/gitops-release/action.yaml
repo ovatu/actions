@@ -65,8 +65,8 @@ runs:
         touch preview/values.yaml
         touch preview/Chart.yaml
 
-        CHART_NAME = $(yq r chart/Chart.yaml .name)
-        CHART_VERSION = $(yq r chart/Chart.yaml .version)
+        CHART_NAME=$(yq r chart/Chart.yaml .name)
+        CHART_VERSION=$(yq r chart/Chart.yaml .version)
 
         yq -i ".name = \"preview\"" preview/Chart.yaml
         yq -i ".version = \"1.0.0\"" preview/Chart.yaml
