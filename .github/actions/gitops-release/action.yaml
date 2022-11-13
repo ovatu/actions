@@ -57,7 +57,7 @@ runs:
       if: inputs.values-script
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}/chart
-      run: inputs.values-script
+      run: ${{ inputs.values-script }}
 
     - name: Touch preview file
       if: inputs.preview == 'true'
