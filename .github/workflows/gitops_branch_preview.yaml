@@ -119,7 +119,24 @@ jobs:
           ${{ inputs.gitops-values-script }}
         preview: ${{ inputs.gitops-preview == true }}
         preview-values: ${{ inputs.gitops-preview-values }}
-        preview-values-script: ${{ inputs.gitops-preview-values-script }}
+        preview-values-script: |
+          echo "BEGIN preview script"
+          touch values.yaml
+          touch Chart.yaml
+
+          export CHART_NAME=$(yq '.name' ../chart/Chart.yaml)
+          export CHART_VERSION=$(yq '.version' ../chart/Chart.yaml)
+
+          yq -i ".name = \"${{ inputs.name }}\"" Chart.yaml
+          yq -i ".version = strenv(CHART_VERSION)" Chart.yaml
+          yq -i ".dependencies[0].name = strenv(CHART_NAME)" Chart.yaml
+          yq -i ".dependencies[0].version = strenv(CHART_VERSION)" Chart.yaml
+          yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
+          echo "DONE preview script"
+
+          echo "${{ github.action_path }}"
+        
+          ${{ inputs.gitops-preview-values-script }}
 
     - name: Send Slack webhook
       uses: slackapi/slack-github-action@v1.23.0

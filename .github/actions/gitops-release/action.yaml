@@ -65,17 +65,6 @@ runs:
       working-directory: gitops/${{ inputs.output-directory }}
       run: |
         mkdir -p preview
-        touch preview/values.yaml
-        touch preview/Chart.yaml
-
-        export CHART_NAME=$(yq '.name' chart/Chart.yaml)
-        export CHART_VERSION=$(yq '.version' chart/Chart.yaml)
-
-        yq -i ".name = \"${{ inputs.name }}\"" preview/Chart.yaml
-        yq -i ".version = strenv(CHART_VERSION)" preview/Chart.yaml
-        yq -i ".dependencies[0].name = strenv(CHART_NAME)" preview/Chart.yaml
-        yq -i ".dependencies[0].version = strenv(CHART_VERSION)" preview/Chart.yaml
-        yq -i ".dependencies[0].repository = \"file://../chart\"" preview/Chart.yaml
 
     - name: Create preview values
       if: inputs.preview == 'true' && inputs.preview-values
