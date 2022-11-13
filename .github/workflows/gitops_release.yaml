@@ -80,7 +80,7 @@ jobs:
     - name: Gitops
       uses: ovatu/actions/.github/actions/gitops-release@main
       with:
-        name: ${{ steps.variables.outputs.tag }}
+        name: ${{ inputs.gitops-name }}-release
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}

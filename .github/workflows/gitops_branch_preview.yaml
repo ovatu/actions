@@ -70,8 +70,6 @@ jobs:
     - name: Set variables
       id: variables
       run: |
-        echo "input.gitops-preview: ${{ inputs.gitops-preview }}"
-
         SLUG=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
         REF=$(git rev-parse --short "$GITHUB_SHA")
 
@@ -105,7 +103,7 @@ jobs:
     - name: Gitops
       uses: ovatu/actions/.github/actions/gitops-release@main
       with:
-        name: ${{ steps.variables.outputs.tag }}
+        name: ${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
         input-directory: ${{ inputs.helm-chart }}
