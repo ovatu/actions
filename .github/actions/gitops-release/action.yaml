@@ -1,6 +1,9 @@
 name: "GitOps"
 description: "Run GitOps"
 inputs:
+  name:
+    description: Name of the release
+    required: true
   values-script:
     description: "Script to run to update values.yaml file"
   preview:
@@ -54,7 +57,7 @@ runs:
       if: inputs.values-script
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}/chart
-      run:  ${{ inputs.values-script }}
+      run: inputs.values-script
 
     - name: Touch preview file
       if: inputs.preview == 'true'
@@ -68,11 +71,8 @@ runs:
         export CHART_NAME=$(yq '.name' chart/Chart.yaml)
         export CHART_VERSION=$(yq '.version' chart/Chart.yaml)
 
-        echo "name: $CHART_NAME"
-        echo "version: $CHART_VERSION"
-
-        yq -i ".name = \"preview\"" preview/Chart.yaml
-        yq -i ".version = \"1.0.0\"" preview/Chart.yaml
+        yq -i ".name = \"${{ inputs.name }}\"" preview/Chart.yaml
+        yq -i ".version = strenv(CHART_VERSION)" preview/Chart.yaml
         yq -i ".dependencies[0].name = strenv(CHART_NAME)" preview/Chart.yaml
         yq -i ".dependencies[0].version = strenv(CHART_VERSION)" preview/Chart.yaml
         yq -i ".dependencies[0].repository = \"file://../chart\"" preview/Chart.yaml
