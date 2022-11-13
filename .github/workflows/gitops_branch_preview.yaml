@@ -43,8 +43,10 @@ on:
         description: Script to run during gitops (update values.preview.yaml)
         type: string
       certificate-issuer-name:
+        type: string
         description: Name of issuer for cert-manager
       certificate-issuer-kind:
+        type: string
         description: Kind (Issuer or ClusterIssuer) for cert-manager
         default: ClusterIssuer
       preview-domain:
