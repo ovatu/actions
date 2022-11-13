@@ -63,6 +63,16 @@ runs:
       run: |
         mkdir -p preview
         touch preview/values.yaml
+        touch preview/Chart.yaml
+
+        CHART_NAME = $(yq r chart/Chart.yaml .name)
+        CHART_VERSION = $(yq r chart/Chart.yaml .version)
+
+        yq -i ".name = \"preview\"" preview/Chart.yaml
+        yq -i ".version = \"1.0.0\"" preview/Chart.yaml
+        yq -i ".dependencies[0].name = strenv(CHART_NAME)" preview/Chart.yaml
+        yq -i ".dependencies[0].version = strenv(CHART_VERSION)" preview/Chart.yaml
+        yq -i ".dependencies[0].repository = \"file://../chart\"" preview/Chart.yaml
 
     - name: Create preview values
       if: inputs.preview == 'true' && inputs.preview-values
