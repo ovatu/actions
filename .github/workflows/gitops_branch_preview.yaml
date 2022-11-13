@@ -134,8 +134,9 @@ jobs:
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
           echo "DONE preview script"
 
-          echo "path: $GITHUB_ACTION_PATH"
-        
+          mkdir -p templates
+          cp $GITHUB_ACTION_PATH/yaml/namespace.yaml templates/namespace.yaml
+
           ${{ inputs.gitops-preview-values-script }}
 
     - name: Send Slack webhook
