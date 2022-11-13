@@ -42,6 +42,13 @@ on:
       gitops-preview-values-script:
         description: Script to run during gitops (update values.preview.yaml)
         type: string
+      certificate-issuer-name:
+        description: Name of issuer for cert-manager
+      certificate-issuer-kind:
+        description: Kind (Issuer or ClusterIssuer) for cert-manager
+        default: ClusterIssuer
+      preview-domain:
+        description: Domain to use as the base for previews
     secrets:
       AWS_ASSUME_ROLE:
         required: true
@@ -123,6 +130,7 @@ jobs:
           echo "BEGIN preview script"
           touch values.yaml
           touch Chart.yaml
+          mkdir -p templates
 
           export CHART_NAME=$(yq '.name' ../chart/Chart.yaml)
           export CHART_VERSION=$(yq '.version' ../chart/Chart.yaml)
@@ -132,11 +140,18 @@ jobs:
           yq -i ".dependencies[0].name = strenv(CHART_NAME)" Chart.yaml
           yq -i ".dependencies[0].version = strenv(CHART_VERSION)" Chart.yaml
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
-          echo "DONE preview script"
-
-          mkdir -p templates
+          
           cp $GITHUB_ACTION_PATH/yaml/namespace.yaml templates/namespace.yaml
+          cp $GITHUB_ACTION_PATH/yaml/certificate.yaml templates/certificate.yaml
+
           yq -i ".metadata.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" templates/namespace.yaml
+          yq -i ".spec.secretName = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}-tls\"" templates/certificate.yaml
+          yq -i ".spec.issuerRef.name = \"${{ inputs.certificate-issuer-name }}\"" templates/certificate.yaml
+          yq -i ".spec.issuerRef.kind = \"${{ inputs.certificate-issuer-kind }}\"" templates/certificate.yaml
+          yq -i ".spec.commonName = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          yq -i ".spec.dnsNames[+] = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          yq -i ".spec.dnsNames[+] = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          echo "DONE preview script"
 
           ${{ inputs.gitops-preview-values-script }}
 
