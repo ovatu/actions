@@ -134,7 +134,7 @@ jobs:
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
           echo "DONE preview script"
 
-          echo "${{ github.action_path }}"
+          echo "path: $GITHUB_ACTION_PATH"
         
           ${{ inputs.gitops-preview-values-script }}
 
