@@ -50,6 +50,7 @@ on:
         description: Kind (Issuer or ClusterIssuer) for cert-manager
         default: ClusterIssuer
       preview-domain:
+        type: string
         description: Domain to use as the base for previews
     secrets:
       AWS_ASSUME_ROLE:
