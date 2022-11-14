@@ -145,7 +145,7 @@ jobs:
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
           yq -i ".dependencies[0].alias = \"preview\"" Chart.yaml
           
-          cp $GITHUB_ACTION_PATH/templates/ templates
+          cp -r $GITHUB_ACTION_PATH/templates/ templates
 
           yq -i ".namespace.create = true" values.yaml
           yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
