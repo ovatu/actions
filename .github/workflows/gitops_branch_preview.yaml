@@ -147,7 +147,7 @@ jobs:
           
           #cp -a $GITHUB_ACTION_PATH/templates/. templates/
 
-          rsync -vr --delete $GITHUB_ACTION_PATH/templates templates
+          rsync -vr --delete $GITHUB_ACTION_PATH/templates/ templates/
 
           yq -i ".namespace.create = true" values.yaml
           yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
