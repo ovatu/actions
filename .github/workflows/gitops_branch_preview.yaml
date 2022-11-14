@@ -143,17 +143,19 @@ jobs:
           yq -i ".dependencies[0].name = strenv(CHART_NAME)" Chart.yaml
           yq -i ".dependencies[0].version = strenv(CHART_VERSION)" Chart.yaml
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
+          yq -i ".dependencies[0].alias = \"preview\"" Chart.yaml
           
-          cp $GITHUB_ACTION_PATH/yaml/namespace.yaml templates/namespace.yaml
-          cp $GITHUB_ACTION_PATH/yaml/certificate.yaml templates/certificate.yaml
+          cp $GITHUB_ACTION_PATH/templates/ templates
 
-          yq -i ".metadata.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" templates/namespace.yaml
-          yq -i ".spec.secretName = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}-tls\"" templates/certificate.yaml
-          yq -i ".spec.issuerRef.name = \"${{ inputs.certificate-issuer-name }}\"" templates/certificate.yaml
-          yq -i ".spec.issuerRef.kind = \"${{ inputs.certificate-issuer-kind }}\"" templates/certificate.yaml
-          yq -i ".spec.commonName = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
-          yq -i ".spec.dnsNames[0] = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
-          yq -i ".spec.dnsNames[1] = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          yq -i ".namespace.create = true" values.yaml
+          yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
+          yq -i ".certificate.create = true" values.yaml
+          yq -i ".certificate.secretName = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}-tls\"" templates/certificate.yaml
+          yq -i ".certificate.issuerRef.name = \"${{ inputs.certificate-issuer-name }}\"" templates/certificate.yaml
+          yq -i ".certificate.issuerRef.kind = \"${{ inputs.certificate-issuer-kind }}\"" templates/certificate.yaml
+          yq -i ".certificate.commonName = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          yq -i ".certificate.dnsNames[0] = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
+          yq -i ".certificate.dnsNames[1] = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" templates/certificate.yaml
           echo "DONE preview script"
 
           ${{ inputs.gitops-preview-values-script }}
