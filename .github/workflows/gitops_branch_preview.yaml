@@ -153,9 +153,7 @@ jobs:
           yq -i ".certificate.secretName = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}-tls\"" values.yaml
           yq -i ".certificate.issuerRef.name = \"${{ inputs.certificate-issuer-name }}\"" values.yaml
           yq -i ".certificate.issuerRef.kind = \"${{ inputs.certificate-issuer-kind }}\"" values.yaml
-          yq -i ".certificate.commonName = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" values.yaml
-          yq -i ".certificate.dnsNames[0] = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" values.yaml
-          yq -i ".certificate.dnsNames[1] = \"*.${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" values.yaml
+          yq -i ".certificate.domain = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}\"" values.yaml
           echo "DONE preview script"
 
           ${{ inputs.gitops-preview-values-script }}

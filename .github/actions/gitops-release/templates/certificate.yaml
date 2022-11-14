@@ -8,7 +8,8 @@ spec:
   issuerRef:
     name: {{ .Values.certificate.issuerRef.name }}
     kind: {{ .Values.certificate.issuerRef.kind }}
-  commonName: {{ .Values.certificate.commonName }}
+  commonName: "*.{{ .Values.certificate.domain }}"
   dnsNames:
-    {{- .Values.certificate.dnsNames | toYaml | nindent 4 }}
+    - "{{ .Values.certificate.domain }}"
+    - "*.{{ .Values.certificate.domain }}"
 {{- end -}}
