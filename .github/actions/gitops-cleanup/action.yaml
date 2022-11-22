@@ -33,7 +33,10 @@ runs:
 
     - name: "Deleting directory"
       shell: bash
-      run: rm -r $GITHUB_WORKSPACE/gitops/${{ inputs.directory }}
+      run: |
+        if [ -d "$GITHUB_WORKSPACE/gitops/${{ inputs.directory }}" ] then
+          rm -r $GITHUB_WORKSPACE/gitops/${{ inputs.directory }}
+        fi
 
     - name: "Commit changes to GitOps repo"
       shell: bash
