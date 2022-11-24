@@ -34,7 +34,8 @@ runs:
     - name: "Deleting directory"
       shell: bash
       run: |
-        if [ -d "$GITHUB_WORKSPACE/gitops/${{ inputs.directory }}" ] then
+        if [ -d "$GITHUB_WORKSPACE/gitops/${{ inputs.directory }}" ]
+        then
           rm -r $GITHUB_WORKSPACE/gitops/${{ inputs.directory }}
         fi
 
