@@ -37,6 +37,9 @@ runs:
         if [ -d "$GITHUB_WORKSPACE/gitops/${{ inputs.directory }}" ]
         then
           rm -r $GITHUB_WORKSPACE/gitops/${{ inputs.directory }}
+          echo "success=true" >> $GITHUB_OUTPUT
+        else
+          echo "success=false" >> $GITHUB_OUTPUT
         fi
 
     - name: "Commit changes to GitOps repo"

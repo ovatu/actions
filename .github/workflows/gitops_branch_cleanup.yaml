@@ -41,6 +41,7 @@ jobs:
 
     - name: Gitops cleanup
       uses: ovatu/actions/.github/actions/gitops-cleanup@main
+      id: cleanup
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
@@ -49,6 +50,7 @@ jobs:
 
     - name: Send Slack webhook
       uses: slackapi/slack-github-action@v1.23.0
+      if: steps.cleanup.outputs.success == 'true'
       with:
         payload: |
           {
