@@ -111,6 +111,8 @@ jobs:
         tags: |
           ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
+        build-args: |
+          VERSION=${{ steps.variables.outputs.tag }}
 
     - name: Gitops
       uses: ovatu/actions/.github/actions/gitops-release@main
