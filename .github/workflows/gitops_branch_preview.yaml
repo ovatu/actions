@@ -163,7 +163,8 @@ jobs:
 
           ${{ inputs.gitops-preview-values-script }}
 
-    - name: Send Slack webhook
+    - name: Send Slack preview webhook
+      if: ${{ inputs.gitops-preview }}
       uses: slackapi/slack-github-action@v1.23.0
       with:
         payload: |
@@ -175,6 +176,70 @@ jobs:
                 "text": {
                   "type": "plain_text",
                   "text": "Preview deployed: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": ${{ toJson(github.event.head_commit.message || 'No message') }}
+                },
+                "accessory": {
+                  "type": "button",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "View Preview"
+                  },
+                  "url": "${{ inputs.gitops-name }}-$SLUG.${{ inputs.preview-domain }}"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*App:* ${{ inputs.gitops-name }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Version:* ${{ steps.variables.outputs.tag }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Repo:* ${{ github.repository }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Branch:* ${{ steps.variables.outputs.branch }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit:* ${{ steps.variables.outputs.ref }}"
+                  }
+                ]
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+    - name: Send Slack build webhook
+      if: ${{ !inputs.gitops-preview }}
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        payload: |
+          {
+            "text": "Branch built: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}: ${{ steps.variables.outputs.ref }}",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Branch built: ${{ inputs.name }} / ${{ steps.variables.outputs.branch }}"
                 }
               },
               {
