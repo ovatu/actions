@@ -183,14 +183,6 @@ jobs:
                 "text": {
                   "type": "mrkdwn",
                   "text": ${{ toJson(github.event.head_commit.message || 'No message') }}
-                },
-                "accessory": {
-                  "type": "button",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "View Preview"
-                  },
-                  "url": "${{ inputs.gitops-name }}-$SLUG.${{ inputs.preview-domain }}"
                 }
               },
               {
@@ -218,6 +210,10 @@ jobs:
                   {
                     "type": "mrkdwn",
                     "text": "*Commit:* ${{ steps.variables.outputs.ref }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Link:* ${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}"
                   }
                 ]
               }
