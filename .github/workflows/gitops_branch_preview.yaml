@@ -213,7 +213,7 @@ jobs:
                   },
                   {
                     "type": "mrkdwn",
-                    "text": "*Link:* ${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}"
+                    "text": "*Link:* https://${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}.${{ inputs.preview-domain }}"
                   }
                 ]
               }
