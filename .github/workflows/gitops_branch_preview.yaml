@@ -18,6 +18,10 @@ on:
       docker-file:
         description: Location of Dockerfile
         type: string
+      docker-platforms:
+        description: Docker build platforms
+        type: string
+        default: linux/amd64
       helm-chart:
         description: Location of helm charts
         type: string
@@ -107,6 +111,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         file: deploy/kubernetes/docker/Dockerfile
+        platforms: ${{ inputs.docker-platforms }}
         push: true
         tags: |
           ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
