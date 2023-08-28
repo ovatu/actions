@@ -76,7 +76,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         file: deploy/kubernetes/docker/Dockerfile
-        platforms: ${{ inputs.docker-platforms }}
+        #platforms: ${{ inputs.docker-platforms }}
         push: true
         tags: |
           ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
