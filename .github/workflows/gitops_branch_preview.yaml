@@ -97,6 +97,12 @@ jobs:
         echo "GITOPS_WILDCARD_PREVIEW_DOMAIN=*.${{ inputs.gitops-name }}-$SLUG.${{ inputs.preview-domain }}" >> $GITHUB_ENV
         echo "GITOPS_CERTIFICATE_NAME=${{ inputs.gitops-name }}-$SLUG-tls" >> $GITHUB_ENV
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - name: Login to Docker
       if: inputs.docker
       id: docker-login
