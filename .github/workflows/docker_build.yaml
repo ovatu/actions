@@ -47,7 +47,6 @@ jobs:
 
         TAG="${{ inputs.docker-tag }}"
 
-
         TAG=$(echo "$TAG" | sed 's/{COMMIT}/'"${COMMIT}"'/g')
         TAG=$(echo "$TAG" | sed 's/{REF}/'"${REF}"'/g')
 
