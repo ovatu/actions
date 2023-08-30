@@ -47,8 +47,8 @@ jobs:
 
         TAG="${{ inputs.docker-tag }}"
 
-        TAG=$(echo "$TAG" | sed 's/{COMMIT}/'"$COMMIT"';')
-        TAG=$(echo "$TAG" | sed 's/{REF}/'"$REF"';')
+        TAG=$(echo "$TAG" | sed 's/{COMMIT}/'"${COMMIT}"'/g')
+        TAG=$(echo "$TAG" | sed 's/{REF}/'"${REF}"'/g')
 
         TAG=$(echo "$TAG" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
 
