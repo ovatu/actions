@@ -64,6 +64,12 @@ jobs:
         echo "tag=release-${{ github.ref_name }}" >> $GITHUB_OUTPUT
         echo "release=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
     - name: Login to Docker
       id: docker-login
       uses: ovatu/actions/.github/actions/docker-login@main
@@ -76,7 +82,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         file: deploy/kubernetes/docker/Dockerfile
-        #platforms: ${{ inputs.docker-platforms }}
+        platforms: ${{ inputs.docker-platforms }}
         push: true
         tags: |
           ${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
