@@ -39,6 +39,21 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
+    - name: Set variables
+      id: variables
+      run: |
+        COMMIT=$(git rev-parse --short "$GITHUB_SHA")
+        REF=${{ github.ref_name }}
+
+        TAG="${{ inputs.docker-tag }}"
+
+        TAG=$(echo "$TAG" | sed 's/{COMMIT}/'"$COMMIT"'')
+        TAG=$(echo "$TAG" | sed 's/{REF}/'"$REF"'')
+
+        TAG=$(echo "$TAG" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
 
@@ -60,7 +75,7 @@ jobs:
         platforms: ${{ inputs.docker-platforms }}
         push: true
         tags: |
-          ${{ inputs.docker-repo }}:${{ inputs.docker-tag }}
-          ${{ steps.docker-login.outputs.ecr-registry }}/${{ inputs.docker-repo }}:${{ inputs.docker-tag }}
+          ${{ inputs.docker-repo }}:${{ steps.variables.outputs.tag }}
+          ${{ steps.docker-login.outputs.ecr-registry }}/${{ inputs.docker-repo }}:${{ steps.variables.outputs.tag }}
         build-args: |
-          VERSION=${{ inputs.docker-tag }}
+          VERSION=${{ steps.variables.outputs.tag }}
