@@ -43,14 +43,12 @@ jobs:
       id: variables
       run: |
         COMMIT=$(git rev-parse --short "$GITHUB_SHA")
-        REF=${{ github.ref_name }}
+        REF=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
 
         TAG="${{ inputs.docker-tag }}"
 
         TAG=$(echo "$TAG" | sed 's/{COMMIT}/'"${COMMIT}"'/g')
         TAG=$(echo "$TAG" | sed 's/{REF}/'"${REF}"'/g')
-
-        TAG=$(echo "$TAG" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
 
         echo "tag=$TAG" >> $GITHUB_OUTPUT
 
