@@ -86,7 +86,9 @@ jobs:
 
     - name: Allow access to other repos
       if: inputs.github-repos-access
-      run: git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf ssh://git@github.com/
+      run: |
+        git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf ssh://git@github.com/
+        git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf git+ssh://git@github.com/
 
     - name: Build and push
       uses: docker/build-push-action@v3
