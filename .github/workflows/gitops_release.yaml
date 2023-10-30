@@ -41,6 +41,8 @@ on:
         required: true
       GITOPS_REPO_PRIVATE_KEY:
         required: true
+      GITHUB_REPOS_PAT:
+        required: false
       SLACK_WEBHOOK_URL:
         required: true
 
@@ -77,6 +79,10 @@ jobs:
         docker-hub-username: ${{ secrets.DOCKER_HUB_USERNAME }}
         docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
         aws-assume-role: ${{ secrets.AWS_ASSUME_ROLE }}
+
+    - name: Allow access to other repos
+      if: secrets.GITHUB_REPOS_PAT
+      run: git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf ssh://git@github.com/
 
     - name: Build and push
       uses: docker/build-push-action@v3
