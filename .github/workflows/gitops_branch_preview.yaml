@@ -25,10 +25,6 @@ on:
       helm-chart:
         description: Location of helm charts
         type: string
-      github-repos-access:
-        description: Allow access to other github repos (must provide PAT in secrets)
-        type: boolean
-        default: false
       gitops-repo:
         description: Repo for gitops
         type: string
@@ -118,17 +114,10 @@ jobs:
         docker-hub-password: ${{ secrets.DOCKER_HUB_PASSWORD }}
         aws-assume-role: ${{ secrets.AWS_ASSUME_ROLE }}
 
-    - name: Allow access to other repos
-      if: inputs.github-repos-access
-      run: |
-        git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf ssh://git@github.com/
-        git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf git+ssh://git@github.com/
-
     - name: Build and push
       if: inputs.docker
       uses: docker/build-push-action@v4
       with:
-        driver: docker
         file: deploy/kubernetes/docker/Dockerfile
         platforms: ${{ inputs.docker-platforms }}
         push: true
@@ -137,6 +126,8 @@ jobs:
           ${{ steps.docker-login.outputs.ecr-registry }}/${{ steps.variables.outputs.repo }}:${{ steps.variables.outputs.tag }}
         build-args: |
           VERSION=${{ steps.variables.outputs.tag }}
+        secrets: |
+          "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
 
     - name: Gitops
       uses: ovatu/actions/.github/actions/gitops-release@main
