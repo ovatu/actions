@@ -128,6 +128,7 @@ jobs:
       if: inputs.docker
       uses: docker/build-push-action@v4
       with:
+        driver: docker
         file: deploy/kubernetes/docker/Dockerfile
         platforms: ${{ inputs.docker-platforms }}
         push: true

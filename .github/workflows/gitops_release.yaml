@@ -93,6 +93,7 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
+        driver: docker
         file: deploy/kubernetes/docker/Dockerfile
         platforms: ${{ inputs.docker-platforms }}
         push: true
