@@ -25,6 +25,10 @@ on:
       helm-chart:
         description: Location of helm charts
         type: string
+      github-repos-access:
+        description: Allow access to other github repos (must provide PAT in secrets)
+        type: boolean
+        default: false
       gitops-repo:
         description: Repo for gitops
         type: string
@@ -115,7 +119,7 @@ jobs:
         aws-assume-role: ${{ secrets.AWS_ASSUME_ROLE }}
 
     - name: Allow access to other repos
-      if: secrets.GITHUB_REPOS_PAT
+      if: inputs.github-repos-access
       run: git config --global url."https://${{ secrets.GITHUB_REPOS_PAT }}@github.com/".insteadOf ssh://git@github.com/
 
     - name: Build and push
