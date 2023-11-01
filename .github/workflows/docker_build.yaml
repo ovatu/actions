@@ -28,6 +28,8 @@ on:
         required: true
       DOCKER_HUB_PASSWORD:
         required: true
+      GITHUB_REPOS_PAT:
+        required: false
 
 permissions:
   contents: read
@@ -81,3 +83,5 @@ jobs:
         build-args: |
           VERSION=${{ steps.variables.outputs.tag }}
           ${{ inputs.docker-build-args }}
+        secrets: |
+          "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
