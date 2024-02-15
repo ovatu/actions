@@ -38,6 +38,14 @@ jobs:
 
         echo "branch=${{ github.event.ref }}" >> $GITHUB_OUTPUT
         echo "slug=$SLUG" >> $GITHUB_OUTPUT
+        
+        BRANCH_NAME="${{ github.event.ref }}"
+        if [[ "$BRANCH_NAME" == *"canary" ]]; then
+          DIRECTORY="canaries"
+        else
+          DIRECTORY="branches"
+        fi
+        echo "directory=$DIRECTORY" >> $GITHUB_ENV
 
     - name: Gitops cleanup
       uses: ovatu/actions/.github/actions/gitops-cleanup@main
@@ -45,7 +53,7 @@ jobs:
       with:
         repository: ${{ inputs.gitops-repo }}
         repository-ssh-key: ${{ secrets.GITOPS_REPO_PRIVATE_KEY }}
-        directory: apps/${{ inputs.gitops-name }}/branches/${{ steps.variables.outputs.slug }}
+        directory: apps/${{ inputs.gitops-name }}/${{ env.directory }}/${{ steps.variables.outputs.slug }}
         message: "[Actions][Cleanup] repo:${{ inputs.gitops-name }}, branch: ${{ steps.variables.outputs.branch }}"
 
     - name: Send Slack webhook

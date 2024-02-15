@@ -14,6 +14,14 @@ inputs:
     description: "values to create values.preview.yaml file"
   preview-values-script:
     description: "Script to run to update values.preview.yaml file"
+  canary:
+    description: "Should do canary release"
+    type: boolean
+    default: false
+  canary-values:
+    description: "values to create values.canary.yaml file"
+  canary-values-script:
+    description: "Script to run to update values.canary.yaml file"
   repository:
     required: true
     description: "Repo to use for GitOps"
@@ -26,6 +34,10 @@ inputs:
   output-directory:
     required: true
     description: "Output directory, in the GitOps repo to place the output, usually a helm chart"
+  canary-master-values-path:
+    description: "where to copy the master values from, either a branch or release"
+  gitops-name:
+    description: "the name of the app in the gitops repo"
   message:
     required: true
     description: "Message to use as part of the GitOps commit"
@@ -83,6 +95,42 @@ runs:
       shell: bash
       working-directory: gitops/${{ inputs.output-directory }}
       run: rm -rf preview
+
+    - name: Touch canary file
+      if: inputs.canary == 'true'
+      shell: bash
+      working-directory: gitops/${{ inputs.output-directory }}
+      run: |
+        mkdir -p canary
+
+    - name: Create canary values
+      if: inputs.canary == 'true' && inputs.canary-master-values-path
+      shell: bash
+      working-directory: gitops
+      run: |
+        if [[ "${{ inputs.canary-master-values-path }}" == "release" ]]; then
+          FULL_PATH="apps/${{ inputs.gitops-name }}/release/chart/values.yaml"
+        else
+          FULL_PATH="apps/${{ inputs.gitops-name }}/branches/${{ inputs.canary-master-values-path }}/chart/values.yaml"
+        fi
+
+        if [ ! -f "$FULL_PATH" ]; then
+          echo "File not found: $FULL_PATH"
+          exit 1
+        fi
+        cp "$FULL_PATH" ${{ inputs.output-directory }}/canary/canary.yaml
+
+    - name: Run canary-values script
+      if: inputs.canary == 'true' && inputs.canary-values-script
+      shell: bash
+      working-directory: gitops/${{ inputs.output-directory }}/canary
+      run: ${{ inputs.canary-values-script }}
+
+    - name: remove canary if empty
+      if: inputs.canary != 'true'
+      shell: bash
+      working-directory: gitops/${{ inputs.output-directory }}
+      run: rm -rf canary
 
     - name: "Commit changes to GitOps repo"
       shell: bash
