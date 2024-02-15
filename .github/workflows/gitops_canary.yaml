@@ -35,7 +35,7 @@ on:
       gitops-canary-values-script:
         description: Script to run during gitops (update canary values.yaml)
         type: string
-      gitops-master-values-path:
+      gitops-canary-master-values-path:
         description: branch name to take over, or release for production
         type: string
       gitops-ingress-path:
@@ -113,8 +113,7 @@ jobs:
         input-directory: ${{ inputs.helm-chart }}
         output-directory: apps/${{ inputs.gitops-name }}/canaries/${{ steps.variables.outputs.slug }}
         gitops-name: ${{ inputs.gitops-name }}
-        ingress-path: ${{ inputs.gitops-ingress-path }}
-        master-values-path: ${{ inputs.gitops-master-values-path }}
+        canary-master-values-path: ${{ inputs.gitops-canary-master-values-path }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, canary: ${{ steps.variables.outputs.release }}"
         values-script: |
           echo "BEGIN writing values"

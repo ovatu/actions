@@ -34,12 +34,10 @@ inputs:
   output-directory:
     required: true
     description: "Output directory, in the GitOps repo to place the output, usually a helm chart"
-  master-values-path:
+  canary-master-values-path:
     description: "where to copy the master values from, either a branch or release"
   gitops-name:
     description: "the name of the app in the gitops repo"
-  ingress-path:
-    description: "path to ingress"
   message:
     required: true
     description: "Message to use as part of the GitOps commit"
@@ -106,14 +104,14 @@ runs:
         mkdir -p canary
 
     - name: Create canary values
-      if: inputs.canary == 'true' && inputs.master-values-path
+      if: inputs.canary == 'true' && inputs.canary-master-values-path
       shell: bash
       working-directory: gitops
       run: |
-        if [[ "${{ inputs.master-values-path }}" == "release" ]]; then
+        if [[ "${{ inputs.canary-master-values-path }}" == "release" ]]; then
           FULL_PATH="apps/${{ inputs.gitops-name }}/release/chart/values.yaml"
         else
-          FULL_PATH="apps/${{ inputs.gitops-name }}/branches/${{ inputs.master-values-path }}/chart/values.yaml"
+          FULL_PATH="apps/${{ inputs.gitops-name }}/branches/${{ inputs.canary-master-values-path }}/chart/values.yaml"
         fi
 
         if [ ! -f "$FULL_PATH" ]; then
