@@ -80,6 +80,7 @@ jobs:
         echo "repo=${{ inputs.docker-name }}" >> $GITHUB_OUTPUT
         echo "tag=$SLUG-$REF" >> $GITHUB_OUTPUT
         echo "canary=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "slug=$SLUG" >> $GITHUB_OUTPUT
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
