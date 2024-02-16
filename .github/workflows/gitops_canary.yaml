@@ -75,9 +75,11 @@ jobs:
     - name: Set variables
       id: variables
       run: |
+        SLUG=$(echo "${{ github.ref_name }}" | iconv -t ascii//TRANSLIT | sed -r s/[^a-zA-Z0-9]+/-/g | sed -r s/^-+\|-+$//g | tr A-Z a-z)
+        REF=$(git rev-parse --short "$GITHUB_SHA")
         echo "repo=${{ inputs.docker-name }}" >> $GITHUB_OUTPUT
-        echo "tag=release-${{ github.ref_name }}" >> $GITHUB_OUTPUT
-        echo "release=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "tag=$SLUG-$REF" >> $GITHUB_OUTPUT
+        echo "canary=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -119,7 +121,7 @@ jobs:
         gitops-name: ${{ inputs.gitops-name }}
         canary: ${{ inputs.gitops-canary == true }}
         canary-master-values-path: ${{ inputs.gitops-canary-master-values-path }}
-        message: "[Actions][Build] repo:${{ inputs.gitops-name }}, canary: ${{ steps.variables.outputs.release }}"
+        message: "[Actions][Build] repo:${{ inputs.gitops-name }}, canary: ${{ steps.variables.outputs.canary }}"
         values-script: |
           echo "BEGIN writing values"
           yq -i '.appVersion = "${{ steps.variables.outputs.tag }}"' Chart.yaml
@@ -164,13 +166,13 @@ jobs:
       with:
         payload: |
           {
-            "text": "Canary release deployed: ${{ inputs.name }}, v: ${{ steps.variables.outputs.release }}, weight: ${{ github.event.inputs.weight }}",
+            "text": "Canary release deployed: ${{ inputs.name }}, v: ${{ steps.variables.outputs.canary }}, weight: ${{ github.event.inputs.weight }}",
             "blocks": [
               {
                 "type": "header",
                 "text": {
                   "type": "plain_text",
-                  "text": "Canary release deployed: ${{ inputs.name }}, v: ${{ steps.variables.outputs.release }}"
+                  "text": "Canary release deployed: ${{ inputs.name }}, v: ${{ steps.variables.outputs.canary }}"
                 }
               },
               {
