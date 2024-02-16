@@ -147,7 +147,7 @@ jobs:
           yq -i ".dependencies[0].repository = \"file://../chart\"" Chart.yaml
           yq -i ".dependencies[0].alias = \"canary\"" Chart.yaml
           
-          rsync -vr --delete $GITHUB_ACTION_PATH/templates/ templates/
+          rsync -vr --delete --exclude '01-certificate.yaml' $GITHUB_ACTION_PATH/templates/ templates/
           
           yq -i ".namespace.enabled = true" values.yaml
           yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
