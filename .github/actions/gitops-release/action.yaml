@@ -119,6 +119,7 @@ runs:
           exit 1
         fi
         cp "$FULL_PATH" ${{ inputs.output-directory }}/canary/canary.yaml
+        touch ${{ inputs.output-directory }}/canary/values.yaml
 
     - name: Run canary-values script
       if: inputs.canary == 'true' && inputs.canary-values-script
