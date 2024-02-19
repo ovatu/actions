@@ -109,11 +109,12 @@ runs:
       working-directory: gitops
       run: |
         FULL_PATH="bootstrap/apps/${{ inputs.gitops-name }}/values/${{ inputs.canary-master-values-path }}.yaml"
+        OUTPUT_FILE="${{ inputs.output-directory }}/canary/canary.yaml"
         if [ ! -f "$FULL_PATH" ]; then
           echo "File not found: $FULL_PATH"
           exit 1
         fi
-        cp "$FULL_PATH" ${{ inputs.output-directory }}/canary/canary.yaml
+        cp "$FULL_PATH" "$OUTPUT_FILE" && yq eval '. |= {"canary": .}' -i "$OUTPUT_FILE"
         touch ${{ inputs.output-directory }}/canary/values.yaml
 
     - name: Run canary-values script
