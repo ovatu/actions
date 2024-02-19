@@ -122,6 +122,7 @@ jobs:
         gitops-name: ${{ inputs.gitops-name }}
         canary: ${{ inputs.gitops-canary == true }}
         canary-master-values-path: ${{ inputs.gitops-canary-master-values-path }}
+        gitops-ingress-path: ${{ inputs.gitops-ingress-path }}
         message: "[Actions][Build] repo:${{ inputs.gitops-name }}, canary: ${{ steps.variables.outputs.canary }}"
         values-script: |
           echo "BEGIN writing values"

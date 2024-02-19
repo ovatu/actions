@@ -38,6 +38,8 @@ inputs:
     description: "where to copy the master values from, either development/release or another bootstrap values file"
   gitops-name:
     description: "the name of the app in the gitops repo"
+  gitops-ingress-path:
+    description: "path to ingress for this app"
   message:
     required: true
     description: "Message to use as part of the GitOps commit"
@@ -104,7 +106,7 @@ runs:
         mkdir -p canary
 
     - name: Create canary values
-      if: inputs.canary == 'true' && inputs.canary-master-values-path
+      if: inputs.canary == 'true' && inputs.canary-master-values-path && inputs.gitops-ingress-path
       shell: bash
       working-directory: gitops
       run: |
@@ -115,7 +117,7 @@ runs:
           exit 1
         fi
         cp "$FULL_PATH" "$OUTPUT_FILE"
-        yq eval 'del(.ingress.annotations."cert-manager.io/cluster-issuer")' -i "$OUTPUT_FILE"
+        yq eval "del(.${{ inputs.gitops-ingress-path }}.annotations.\"cert-manager.io/cluster-issuer\")" -i "$OUTPUT_FILE"
         yq eval '. |= {"canary": .}' -i "$OUTPUT_FILE"
         touch ${{ inputs.output-directory }}/canary/values.yaml
 
