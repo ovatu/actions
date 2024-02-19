@@ -40,7 +40,7 @@ on:
         description: Script to run during gitops (update canary values.yaml)
         type: string
       gitops-canary-master-values-path:
-        description: branch name to take over, or release for production
+        description: master values from bootstrap to copy
         type: string
       gitops-ingress-path:
         description: path to ingress
@@ -157,6 +157,7 @@ jobs:
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header\" = \"x-canary\"" values.yaml
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header-value\" = \"true\"" values.yaml
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-weight\" = \"${{ github.event.inputs.weight }}\"" values.yaml
+          yq -i ".canary.${{ inputs.gitops-ingress-path }}.enabled = true" values.yaml
 
           echo "BEGIN inputs.gitops-canary-values-script"
           ${{ inputs.gitops-canary-values-script }}

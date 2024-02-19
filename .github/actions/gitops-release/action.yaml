@@ -35,7 +35,7 @@ inputs:
     required: true
     description: "Output directory, in the GitOps repo to place the output, usually a helm chart"
   canary-master-values-path:
-    description: "where to copy the master values from, either a branch or release"
+    description: "where to copy the master values from, either development/release or another bootstrap values file"
   gitops-name:
     description: "the name of the app in the gitops repo"
   message:
@@ -108,12 +108,7 @@ runs:
       shell: bash
       working-directory: gitops
       run: |
-        if [[ "${{ inputs.canary-master-values-path }}" == "release" ]]; then
-          FULL_PATH="apps/${{ inputs.gitops-name }}/release/chart/values.yaml"
-        else
-          FULL_PATH="apps/${{ inputs.gitops-name }}/branches/${{ inputs.canary-master-values-path }}/chart/values.yaml"
-        fi
-
+        FULL_PATH="bootstrap/apps/${{ inputs.gitops-name }}/values/${{ inputs.canary-master-values-path }}.yaml"
         if [ ! -f "$FULL_PATH" ]; then
           echo "File not found: $FULL_PATH"
           exit 1
