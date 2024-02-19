@@ -153,11 +153,11 @@ jobs:
           yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
 
           yq -i ".canary.enabled = true" values.yaml
-          yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary\" = \"true\"" values.yaml
-          yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header\" = \"x-canary\"" values.yaml
-          yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header-value\" = \"true\"" values.yaml
-          yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-weight\" = \"${{ github.event.inputs.weight }}\"" values.yaml
-          yq -i ".canary.${{ inputs.gitops-ingress-path }}.enabled = true" values.yaml
+          yq -i ".${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary\" = \"true\"" values.yaml
+          yq -i ".${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header\" = \"x-canary\"" values.yaml
+          yq -i ".${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header-value\" = \"true\"" values.yaml
+          yq -i ".${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-weight\" = \"${{ github.event.inputs.weight }}\"" values.yaml
+          yq -i ".${{ inputs.gitops-ingress-path }}.enabled = true" values.yaml
 
           echo "BEGIN inputs.gitops-canary-values-script"
           ${{ inputs.gitops-canary-values-script }}
