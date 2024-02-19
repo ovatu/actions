@@ -158,6 +158,7 @@ jobs:
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-by-header-value\" = \"true\"" values.yaml
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary-weight\" = \"${{ github.event.inputs.weight }}\"" values.yaml
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.enabled = true" values.yaml
+          yq -i ".canary.${{ inputs.gitops-ingress-path }}.gloo = false" values.yaml
 
           echo "BEGIN inputs.gitops-canary-values-script"
           ${{ inputs.gitops-canary-values-script }}
