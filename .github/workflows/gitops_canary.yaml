@@ -151,7 +151,7 @@ jobs:
           rsync -vr --delete --exclude '01-certificate.yaml' $GITHUB_ACTION_PATH/templates/ templates/
           
           yq -i ".namespace.enabled = true" values.yaml
-          yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}\"" values.yaml
+          yq -i ".namespace.name = \"${{ inputs.gitops-name }}-${{ steps.variables.outputs.slug }}-canary\"" values.yaml
 
           yq -i ".canary.enabled = true" values.yaml
           yq -i ".canary.${{ inputs.gitops-ingress-path }}.annotations.\"nginx.ingress.kubernetes.io/canary\" = \"true\"" values.yaml
