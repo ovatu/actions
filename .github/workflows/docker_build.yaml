@@ -22,6 +22,7 @@ on:
         description: Docker build arguments
         type: string
       runs-on:
+        type: string
         default: ubuntu-latest
     secrets:
       AWS_ASSUME_ROLE:
