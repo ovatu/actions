@@ -51,6 +51,13 @@ inputs:
     required: true
     default: ci@ovatu.com
     description: "Message to use as part of the GitOps commit"
+  argocd-host:
+    description: "ArgoCD host"
+  argocd-token:
+    description: "ArgoCD Bearer access token"
+  argocd-app-name:
+    description: "ArgoCD app name"
+
 runs:
   using: "composite"
   steps:
@@ -147,3 +154,10 @@ runs:
           git pull --rebase
           git push
         fi
+
+    - name: Refresh ArgoCD app
+      if: inputs.argocd-host && inputs.argocd-token && inputs.argocd-app-name
+      shell: bash
+      working-directory: gitops
+      run: |
+        curl --header "Content-Type: application/json" --header "Authorization: Bearer ${{ inputs.argocd-token }}" "${{ inputs.argocd-host }}/api/v1/applications/${{ inputs.argocd-app-name }}?refresh=normal"
