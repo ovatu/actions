@@ -18,6 +18,7 @@ on:
       docker-file:
         description: Location of Dockerfile
         type: string
+        default: deploy/kubernetes/docker/Dockerfile
       docker-platforms:
         description: Docker build platforms
         type: string
@@ -118,7 +119,7 @@ jobs:
       if: inputs.docker
       uses: docker/build-push-action@v4
       with:
-        file: deploy/kubernetes/docker/Dockerfile
+        file: ${{ inputs.docker-file }}
         platforms: ${{ inputs.docker-platforms }}
         push: true
         tags: |
