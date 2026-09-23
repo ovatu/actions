@@ -36,9 +36,8 @@ on:
         type: string
         default: assets
       static-assets-path:
-        description: Path to the built assets within the exported rootfs
+        description: Path to the built assets within the exported rootfs (required when static-assets is enabled)
         type: string
-        default: /src/.output/public
       helm-chart:
         description: Location of helm charts
         type: string
@@ -88,7 +87,8 @@ jobs:
         echo "release=${{ github.ref_name }}" >> $GITHUB_OUTPUT
 
         # Exposed to the caller's gitops-values-script as strenv(STATIC_ASSETS_CDN)
-        # so each app maps it into its own values schema.
+        # so each app maps it into its own values schema. Kept scheme-less:
+        # consumers (e.g. helm printf "https://%s/") add the scheme.
         CDN=""
         if [ -n "${{ inputs.static-assets-bucket }}" ]; then
           CDN="${{ inputs.static-assets-bucket }}/${{ inputs.static-assets-prefix }}/release-${{ github.ref_name }}"
@@ -141,6 +141,10 @@ jobs:
       env:
         DEST: s3://${{ inputs.static-assets-bucket }}/${{ inputs.static-assets-prefix }}/${{ steps.variables.outputs.tag }}
       run: |
+        if [ -z "${{ inputs.static-assets-path }}" ]; then
+          echo "static-assets-path is required when static-assets is enabled" >&2
+          exit 1
+        fi
         # Assets are content-hashed and land under a per-build prefix, so the
         # whole dir is immutable. index.html rides along unused (the pod serves it).
         aws s3 sync "./__static_assets${{ inputs.static-assets-path }}" "$DEST" \
