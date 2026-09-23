@@ -23,6 +23,26 @@ on:
         description: Docker build platforms
         type: string
         default: linux/amd64
+      static-assets:
+        description: Extract the built dist from the image and upload it to S3 (served via CDN)
+        type: boolean
+        default: false
+      static-assets-bucket:
+        description: S3 bucket for static assets (e.g. static.ovatu.com)
+        type: string
+        default: ''
+      static-assets-prefix:
+        description: Key prefix / property name (e.g. manager-app); assets land at <prefix>/<tag>
+        type: string
+        default: ''
+      static-assets-target:
+        description: Dockerfile stage to export (optional; just makes the export lean). Leave blank to export the full image rootfs.
+        type: string
+        default: assets
+      static-assets-path:
+        description: Path to the built assets within the exported rootfs
+        type: string
+        default: /src/.output/public
       helm-chart:
         description: Location of helm charts
         type: string
@@ -96,6 +116,14 @@ jobs:
         echo "ref=$REF" >> $GITHUB_OUTPUT
         echo "slug=$SLUG" >> $GITHUB_OUTPUT
 
+        # Exposed to the caller's gitops-values-script as strenv(STATIC_ASSETS_CDN)
+        # so each app maps it into its own values schema.
+        CDN=""
+        if [ -n "${{ inputs.static-assets-bucket }}" ]; then
+          CDN="${{ inputs.static-assets-bucket }}/${{ inputs.static-assets-prefix }}/$SLUG-$REF"
+        fi
+        echo "STATIC_ASSETS_CDN=$CDN" >> $GITHUB_ENV
+
         echo "GITOPS_PREVIEW_DOMAIN=${{ inputs.gitops-name }}-$SLUG.${{ inputs.preview-domain }}" >> $GITHUB_ENV
         echo "GITOPS_WILDCARD_PREVIEW_DOMAIN=*.${{ inputs.gitops-name }}-$SLUG.${{ inputs.preview-domain }}" >> $GITHUB_ENV
         echo "GITOPS_CERTIFICATE_NAME=${{ inputs.gitops-name }}-$SLUG-tls" >> $GITHUB_ENV
@@ -129,6 +157,28 @@ jobs:
           VERSION=${{ steps.variables.outputs.tag }}
         secrets: |
           "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
+
+    - name: Export static assets
+      if: ${{ inputs.docker && inputs.static-assets }}
+      uses: docker/build-push-action@v4
+      with:
+        file: ${{ inputs.docker-file }}
+        target: ${{ inputs.static-assets-target }}
+        outputs: type=local,dest=./__static_assets
+        build-args: |
+          VERSION=${{ steps.variables.outputs.tag }}
+        secrets: |
+          "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
+
+    - name: Upload static assets to S3
+      if: ${{ inputs.docker && inputs.static-assets }}
+      env:
+        DEST: s3://${{ inputs.static-assets-bucket }}/${{ inputs.static-assets-prefix }}/${{ steps.variables.outputs.tag }}
+      run: |
+        # Assets are content-hashed and land under a per-build prefix, so the
+        # whole dir is immutable. index.html rides along unused (the pod serves it).
+        aws s3 sync "./__static_assets${{ inputs.static-assets-path }}" "$DEST" \
+          --cache-control "public,max-age=31536000,immutable"
 
     - name: Gitops
       uses: ovatu/actions/.github/actions/gitops-release@main
