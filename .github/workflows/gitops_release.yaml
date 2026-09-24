@@ -63,6 +63,8 @@ on:
         required: true
       GITHUB_REPOS_PAT:
         required: false
+      SENTRY_AUTH_TOKEN:
+        required: false
       SLACK_WEBHOOK_URL:
         required: true
 
@@ -123,6 +125,7 @@ jobs:
           VERSION=${{ steps.variables.outputs.tag }}
         secrets: |
           "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
+          "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
     - name: Export static assets
       if: inputs.static-assets
@@ -135,6 +138,7 @@ jobs:
           VERSION=${{ steps.variables.outputs.tag }}
         secrets: |
           "github_token=${{ secrets.GITHUB_REPOS_PAT }}"
+          "sentry_auth_token=${{ secrets.SENTRY_AUTH_TOKEN }}"
 
     - name: Upload static assets to S3
       if: inputs.static-assets
